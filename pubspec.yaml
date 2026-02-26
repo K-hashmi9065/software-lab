@@ -1,0 +1,48 @@
+name: software_lab_task
+description: "A new Flutter project."
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1 # for font family
+  flutter_svg: ^2.0.9 # for svg images
+  flutter_riverpod: ^2.4.10 # for state management
+  hive: ^2.2.3 # for local database
+  hive_flutter: ^1.1.0 # flutter integration for hive
+  dio: ^5.3.1 # for http requests
+  go_router: ^17.1.0 # for routing
+  flutter_screenutil: ^5.9.0 # for responsive design
+  file_picker: ^8.1.2 # for picking documents/images
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  google_sign_in: ^6.2.0
+  sign_in_with_apple: ^7.0.1
+  flutter_facebook_auth: ^6.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  riverpod_generator: ^2.3.11
+  build_runner: ^2.4.8
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/svg/
+    - assets/svg/auth/
+    - assets/svg/general/
+    - assets/svg/onbording/
