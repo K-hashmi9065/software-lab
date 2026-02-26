@@ -114,8 +114,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw Exception(message);
     }
 
-    // HTTP 200/201 but API reported failure (e.g. "Social id required.")
-    if (body != null && body['success'] == false) {
+    // HTTP 200/201 but API reported failure.
+    // NOTE: The API returns success as a string ("true"/"false"), not a bool.
+    final successVal = body?['success'];
+    final isFailure =
+        successVal == false || successVal == 'false' || successVal == null;
+    if (body != null && isFailure) {
       final message = body['message']?.toString() ?? 'Registration failed';
       throw Exception(message);
     }
@@ -166,8 +170,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     }
 
-    // HTTP 200/201 but API reported failure (e.g. "Account does not exist.")
-    if (body['success'] == false) {
+    // HTTP 200/201 but API reported failure (e.g. "Account does not exist.").
+    // NOTE: The API returns success as a string ("true"/"false"), not a bool.
+    final successVal = body['success'];
+    if (successVal == false || successVal == 'false') {
       throw Exception(body['message']?.toString() ?? 'Login failed');
     }
 

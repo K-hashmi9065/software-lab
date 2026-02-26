@@ -61,6 +61,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       return;
     }
 
+    // Persist the screen-1 fields (all filled by the user at this point)
     ref
         .read(registerProvider.notifier)
         .setScreen1(
@@ -69,6 +70,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           phone: _phoneCtrl.text.trim(),
           password: _passwordCtrl.text,
         );
+
+    // If the user came via social login, preserve the social type & ID that
+    // were stored earlier so the final submission uses the right auth method.
+    final loginState = ref.read(loginProvider);
+    if (loginState.socialType != null) {
+      ref
+          .read(registerProvider.notifier)
+          .setType(loginState.socialType!, socialId: loginState.socialId);
+    }
+
     context.push(AppRoutes.signupForm);
   }
 
@@ -91,23 +102,33 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         context.go(AppRoutes.home);
       }
 
-      // If social login failed เพราะ account dose not exist -> pre-fill details
+      // Google/Facebook/Apple only provides name & email — NOT phone or
+      // password. Pre-fill what we have and let the user complete the rest
+      // on this screen before pressing Continue.
       if (next.errorMessage == 'Account does not exist.' &&
           next.socialEmail != null) {
+        // Pre-fill only the fields Google can give us
         _fullNameCtrl.text = next.socialName ?? '';
         _emailCtrl.text = next.socialEmail ?? '';
 
-        // Ensure the registration will use the correct social type
+        // Store the social type & ID in the register provider now so it
+        // isn't lost when the user eventually presses Continue.
         ref
             .read(registerProvider.notifier)
             .setType(next.socialType ?? 'google', socialId: next.socialId);
 
+        // Ask the user to fill in the remaining fields (phone & password)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Account not found. We\'ve pre-filled your details.'),
+            content: Text(
+              'No account found. Your name & email have been filled in — '
+              'please enter your phone number and set a password to continue.',
+            ),
             behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 4),
           ),
         );
+        // Stay on page 1 so the user can fill phone & password
       } else if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

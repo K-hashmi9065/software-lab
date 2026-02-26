@@ -210,10 +210,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
       final data = await _useCase(request);
 
-      if (data['success'] == false) {
-        throw Exception(data['message'] ?? 'Login failed');
-      }
-
+      // If we reach here the datasource already verified success == true.
       state = state.copyWith(
         isLoading: false,
         isSuccess: true,
@@ -228,9 +225,15 @@ class LoginNotifier extends StateNotifier<LoginState> {
             'Please use the method you used during signup.';
       }
 
+      // 'Account does not exist.' must be stored verbatim so the signup screen
+      // can match it exactly and trigger the pre-fill + redirect logic.
+      // All other errors get the human-readable prefix.
+      final bool isNewUser = errorMessage == 'Account does not exist.';
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Social login failed: $errorMessage',
+        errorMessage: isNewUser
+            ? errorMessage
+            : 'Social login failed: $errorMessage',
       );
     }
   }
